@@ -1,0 +1,21 @@
+{
+  "name": "syno-photo-mems",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "fetch": "^1.1.0",
+    "node-cron": "^3.0.2",
+    "node-fetch": "^3.3.1",
+    "nodemailer": "^6.9.3"
+  }
+}
