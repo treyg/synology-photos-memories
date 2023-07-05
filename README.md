@@ -11,7 +11,7 @@ The easiest way to use this app would be to host it on your NAS using Docker
 To install with docker with Docker using the new container manager, use the following steps:
 
 1. Search for, and download the the image from the Docker registry. Select the latest tag
-   ![Download the image from the docker registry](https://share.cleanshot.com/zVMR0XNlwdVp0bZdkC4H)
+   ![Download the image from the docker registry](./images/step1.jpeg)
 2. Go to the image and click run
 3. Change the container name if you prefer, and click next
 4. Add the following ENV variables
@@ -20,17 +20,17 @@ To install with docker with Docker using the new container manager, use the foll
 
 You'll need the following environment variables to run the image:
 
-| Key                 | Value                                                        |
-| ------------------- | ------------------------------------------------------------ |
-| NAS_IP              | <yournasip>.<yourquickconnectid>.direct.quickconnect.to:5001 |
-| USER_ID             | MyID                                                         |
-| USER_PASSWORD       | password123                                                  |
-| SERVICE_NAME        | gmail                                                        |
-| SEND_BY             | month                                                        |
-| SEND_EMAIL          | emailtosendfrom@gmail.com                                    |
-| SEND_EMAIL_PASSWORD | sendpassword123                                              |
-| RECEIVE_EMAIL       | receiveemail@proton.me                                       |
-| EMAIL_SUBJECT       | Your Monthly Photos                                          |
+| Key                 | Value                                                    |
+| ------------------- | -------------------------------------------------------- |
+| NAS_IP              | yournasip.yourquickconnectid.direct.quickconnect.to:5001 |
+| USER_ID             | MyID                                                     |
+| USER_PASSWORD       | password123                                              |
+| SERVICE_NAME        | gmail                                                    |
+| SEND_BY             | month                                                    |
+| SEND_EMAIL          | emailtosendfrom@gmail.com                                |
+| SEND_EMAIL_PASSWORD | sendpassword123                                          |
+| RECEIVE_EMAIL       | receiveemail@proton.me                                   |
+| EMAIL_SUBJECT       | Your Monthly Photos                                      |
 
 You shouldn't need to change any other settings.
 
@@ -80,7 +80,7 @@ This can be anything you want.
 
 Altogether, your env settings should look something like this:
 
-![ENV settings](https://share.cleanshot.com/XXFXl8Yc2FcHWQmzZBN5)
+![ENV settings](./images/env.jpeg)
 
 5. Click done
 
