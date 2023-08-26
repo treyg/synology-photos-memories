@@ -2,6 +2,9 @@ import fetch from 'node-fetch'
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
 import cron from 'node-cron'
+import express from 'express'
+import path from 'path'
+import { fileURLToPath } from 'url';
 
 dotenv.config()
 
@@ -14,6 +17,13 @@ const sendEmail = process.env.SEND_EMAIL
 const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
+const port = process.env.PORT
+
+const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 async function authenticate() {
   const authResponse = await fetch(
@@ -96,7 +106,7 @@ const transporter = nodemailer.createTransport({
     pass: sendEmailPassword
   }
 })
-
+let photoUrls 
 async function main() {
   const sid = await authenticate()
   const photos = await fetchPhotos(sid)
@@ -122,7 +132,8 @@ async function main() {
       throw new Error(`Invalid sendBy value: ${sendBy}`)
   }
 
-  const photoUrls = returnPhotoUrls(filteredPhotos, sid)
+  photoUrls = returnPhotoUrls(filteredPhotos, sid)
+  console.log('PHOTOURLS: ' + photoUrls)
 
   // Check if photoUrls is empty
   if (photoUrls.length === 0) {
@@ -164,3 +175,13 @@ switch (sendBy) {
 }
 
 cron.schedule(schedule, main)
+
+main()
+
+app.get('/', async (req, res) => {
+  res.render('home', {UrlList: photoUrls});
+})
+
+app.listen(port, () => {
+  console.log(`EXPRESS: ${port}`);
+});
