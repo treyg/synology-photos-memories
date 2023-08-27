@@ -2,11 +2,103 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=0">
     <title>Memories</title>
+    <style>
+        html {
+            font-family: 'Great Vibes', cursive;
+            font-family: 'Rosario', sans-serif;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-align: -moz-center;
+            text-align: -webkit-center;
+            flex-direction: column;
+            min-height: 50vh;
+            width: 100%;
+        }
+        html body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .current-date {
+            width: 100vw; 
+            text-align: center;
+            margin-left: -8px;
+        }
+
+        .image-gallery {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 6vh;
+            padding-right: 40px;
+            max-width: 100%;
+        }
+        .image-gallery > li {
+            height: 250px;
+            cursor: pointer;
+            position: relative;
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: auto;
+        }
+        .image-gallery li a img {
+            -webkit-object-fit: cover;
+            object-fit: cover;
+            height: 100%;
+            min-width: 100%;
+            vertical-align: middle;
+            border-radius: 5px;
+        } 
+        .image-gallery::after {
+            content: "";
+            flex-grow: 999;
+        }
+        @media screen and (max-width: 576px) {
+            .image-gallery > li {
+                height: 100px !important;
+            }
+            .image-gallery {
+                gap: 5px !important;
+                padding-right: 30px !important;
+                padding-left: 30px !important;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Synology Memories</h1>
-    <%-UrlList%>
+    <h1 style="width: 100vw; padding-bottom: 4vh;">Synology Memories</h1>
+
+    <% const uniqueDates = new Set();
+    urlList.forEach(photo => {
+        formattedDate = new Date(photo.date).toLocaleString().split(',')[0]
+        uniqueDates.add(formattedDate);
+    })
+    // uniqueDates.add(new Date().toLocaleString().split(',')[0]); //TODO: eliminate. only for testing
+
+    uniqueDates.forEach(currentDate => {
+        const [month, day, year] = currentDate.split("/").map(Number);
+        const currentDateObj = new Date(year, month - 1, day);
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        const formattedCurrentDate = currentDateObj.toLocaleDateString('en-US', options);
+    %>
+        <strong class="current-date">📌 <%=formattedCurrentDate%></strong> <!--📌 💾 ▶ 📷 🔖 -->
+        <ul class="image-gallery">
+        <% urlList.forEach(photo => { 
+            if (new Date(photo.date).toLocaleString().split(',')[0] != currentDate) return; %>
+            <li>
+                <a href="<%= photo.thumbBig %>">
+                    <img src="<%= photo.thumbBig %>" alt="<%= photo.id %>"> 
+                </a>
+            </li>
+        <% }) %>
+        </ul>
+    <% }) %>
 </body>
 </html>

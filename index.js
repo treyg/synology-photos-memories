@@ -99,6 +99,22 @@ function returnPhotoUrls(photos, sid) {
   })
 }
 
+function returnPhotosInfo(photos, sid) {
+  return photos.map(photo => {
+    const { additional, ...rest } = photo;
+    return {
+      ...rest,
+      thumbBig: getThumbnailUrl(ip, sid, photo),
+      thumbSmall: getThumbnailUrl(ip, sid, photo).replace('&size=xl', '&size=m'),
+      date: retrieveData(photo)
+    };
+  });  
+}
+function retrieveData(photo) {
+  const { time } = photo
+  return new Date(time * 1000) 
+}
+
 const transporter = nodemailer.createTransport({
   service: serviceName,
   auth: {
@@ -106,7 +122,9 @@ const transporter = nodemailer.createTransport({
     pass: sendEmailPassword
   }
 })
+
 let photoUrls 
+let photosRawInfo
 async function main() {
   const sid = await authenticate()
   const photos = await fetchPhotos(sid)
@@ -135,6 +153,9 @@ async function main() {
   photoUrls = returnPhotoUrls(filteredPhotos, sid)
   console.log('PHOTOURLS: ' + photoUrls)
 
+  photosRawInfo = returnPhotosInfo(filteredPhotos, sid)
+  console.log('\nPHOTOS INFO: ' + JSON.stringify(photosRawInfo))
+
   // Check if photoUrls is empty
   if (photoUrls.length === 0) {
     console.log('No photos to send.')
@@ -157,7 +178,7 @@ async function main() {
   })
 }
 
-//main().catch(console.error)
+main().catch(console.error)
 
 let schedule
 switch (sendBy) {
@@ -176,10 +197,8 @@ switch (sendBy) {
 
 cron.schedule(schedule, main)
 
-main()
-
 app.get('/', async (req, res) => {
-  res.render('home', {UrlList: photoUrls});
+  res.render('home', {urlList: photosRawInfo, sendBy: sendBy});
 })
 
 app.listen(port, () => {
