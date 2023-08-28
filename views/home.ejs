@@ -18,7 +18,6 @@
             text-align: -webkit-center;
             flex-direction: column;
             min-height: 50vh;
-            width: 100%;
         }
         html body {
             max-width: 100%;
@@ -69,11 +68,43 @@
                 padding-right: 30px !important;
                 padding-left: 30px !important;
             }
+
+            .btn-dark-toggler {
+                margin-top: 40px !important;
+            }
+            #themeToggleIcon {
+                width: 10vw !important;
+            }
+        }
+
+        .dark{
+            background-color: #222;
+            color: #e6e6e6;
+        }
+
+        .btn-dark-toggler {
+            position: absolute; 
+            right: 0; 
+            top: 0; 
+            margin: 3vw;
+            margin-top: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
         }
     </style>
 </head>
 <body>
-    <h1 style="width: 100vw; padding-bottom: 4vh;">Synology Memories</h1>
+    <header>
+        <div style="width: 75vw; margin-bottom: 4vh;" >
+            <h1 >Synology Memories</h1>
+        </div>
+    </header>
+
+    <button class="btn-dark-toggler" onclick="changeTheme()">
+        <img src="icon-sun.svg" alt="SVG Icon" id="themeToggleIcon" style="width: 3.5vw; filter:invert(72%) sepia(57%) saturate(514%) hue-rotate(341deg) brightness(102%) contrast(102%)">
+    </button>
 
     <% const uniqueDates = new Set();
     urlList.forEach(photo => {
@@ -94,11 +125,26 @@
             if (new Date(photo.date).toLocaleString().split(',')[0] != currentDate) return; %>
             <li>
                 <a href="<%= photo.thumbBig %>">
-                    <img src="<%= photo.thumbBig %>" alt="<%= photo.id %>"> 
+                    <img src="<%= photo.thumbBig %>" alt="<%= photo.id %>" loading="lazy"> 
                 </a>
             </li>
         <% }) %>
         </ul>
     <% }) %>
+
+    <script>
+        const darkThemeClass = 'dark';
+        const themeToggleIcon = document.getElementById('themeToggleIcon')
+        function changeTheme() {
+            let isDarkTheme = document.body.classList.contains(darkThemeClass);
+            localStorage.setItem('theme', isDarkTheme ? 'light' : 'dark');
+            themeToggleIcon.src =  `icon-${!isDarkTheme ? 'moon' : 'sun'}.svg`;
+            themeToggleIcon.style.filter = !isDarkTheme ? 'invert(97%) sepia(15%) saturate(1325%) hue-rotate(186deg) brightness(129%) contrast(100%)': 'invert(72%) sepia(57%) saturate(514%) hue-rotate(341deg) brightness(102%) contrast(102%)';
+            let element = document.body;
+            element.classList.toggle(darkThemeClass); //,!isDarkTheme
+        }
+        // onload change the theme if last time was dark
+        (() => localStorage.getItem('theme') === 'dark' && changeTheme())();
+    </script>
 </body>
 </html>
