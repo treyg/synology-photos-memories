@@ -22,6 +22,7 @@ const port = process.env.PORT
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -35,7 +36,7 @@ async function authenticate() {
 
 async function fetchPhotos(sid) {
   const photosResponse = await fetch(
-    `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail"]`
+    `https://${ip}/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail","resolution"]`
   )
   const photosData = await photosResponse.json()
   //console.log(photosData.data.list[0])
@@ -83,7 +84,7 @@ function getThumbnailUrl(ip, sid, photo) {
       thumbnail: { cache_key }
     }
   } = photo
-  return `https://${ip}/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&version=1&method=get&mode=download&id=${id}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
+  return `https://${ip}/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&version=1&method=get&mode=download&id=${id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
 }
 
 function returnPhotoUrls(photos, sid) {
@@ -104,6 +105,7 @@ function returnPhotosInfo(photos, sid) {
     const { additional, ...rest } = photo;
     return {
       ...rest,
+      resolution: additional.resolution,
       thumbBig: getThumbnailUrl(ip, sid, photo),
       thumbSmall: getThumbnailUrl(ip, sid, photo).replace('&size=xl', '&size=m'),
       date: retrieveData(photo)
@@ -151,10 +153,10 @@ async function main() {
   }
 
   photoUrls = returnPhotoUrls(filteredPhotos, sid)
-  console.log('PHOTOURLS: ' + photoUrls)
+  //console.log('PHOTOURLS: ' + photoUrls)
 
   photosRawInfo = returnPhotosInfo(filteredPhotos, sid)
-  console.log('\nPHOTOS INFO: ' + JSON.stringify(photosRawInfo))
+  //console.log('\nPHOTOS INFO: ' + JSON.stringify(photosRawInfo))
 
   // Check if photoUrls is empty
   if (photoUrls.length === 0) {

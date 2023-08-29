@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=0">
     <title>Memories</title>
     <style>
+        :root {
+            --round-corner-image : 5px;
+            --height-image : 250px;
+        }
+
         html {
-            font-family: 'Great Vibes', cursive;
             font-family: 'Rosario', sans-serif;
         }
         body {
@@ -40,7 +44,7 @@
             max-width: 100%;
         }
         .image-gallery > li {
-            height: 250px;
+            height: var(--height-image);
             cursor: pointer;
             position: relative;
             flex-grow: 1;
@@ -53,15 +57,15 @@
             height: 100%;
             min-width: 100%;
             vertical-align: middle;
-            border-radius: 5px;
+            border-radius: var(--round-corner-image);
         } 
         .image-gallery::after {
             content: "";
             flex-grow: 999;
         }
         @media screen and (max-width: 576px) {
-            .image-gallery > li {
-                height: 100px !important;
+            :root {
+                --height-image : 100px;
             }
             .image-gallery {
                 gap: 5px !important;
@@ -105,7 +109,6 @@
             transition: -webkit-filter 0.5s ease;
             transition: filter 0.5s ease;
         }
-        }
     </style>
 </head>
 <body>
@@ -124,7 +127,6 @@
         formattedDate = new Date(photo.date).toLocaleString().split(',')[0]
         uniqueDates.add(formattedDate);
     })
-    // uniqueDates.add(new Date().toLocaleString().split(',')[0]); //TODO: eliminate. only for testing
 
     uniqueDates.forEach(currentDate => {
         const [month, day, year] = currentDate.split("/").map(Number);
@@ -132,15 +134,15 @@
         const options = { day: 'numeric', month: 'short', year: 'numeric' };
         const formattedCurrentDate = currentDateObj.toLocaleDateString('en-US', options);
     %>
-        <strong class="current-date">📌 <%=formattedCurrentDate%></strong> <!--📌 💾 ▶ 📷 🔖 -->
+        <strong class="current-date">📌 <%=formattedCurrentDate%></strong>
         <ul class="image-gallery">
         <% urlList.forEach(photo => { 
             if (new Date(photo.date).toLocaleString().split(',')[0] != currentDate) return; %>
-            <li>
+            <li original-width="<%= photo.resolution.width %>" original-height="<%= photo.resolution.height %>">
                 <a href="<%= photo.thumbBig %>">
-                    <img src="image-placeholder.svg" style="max-width: 50%; max-height: 50%;" data-src="<%= photo.thumbBig %>" alt="<%= photo.id %>" loading="lazy">
+                    <img src="img.gif" data-src="<%= photo.thumbBig %>" id="img-<%= photo.id %>" style="max-width: 100%; max-height: 100%;" loading="lazy"> 
                     <noscript>
-                    <img src="<%= photo.thumbBig %>" alt="<%= photo.id %>" loading="lazy"> 
+                        <img src="<%= photo.thumbBig %>" alt="img-<%= photo.id %>" loading="lazy"> 
                     </noscript>
                 </a>
             </li>
@@ -149,16 +151,33 @@
     <% }) %>
 
     <script>
+        // placeholder
+        const images = document.querySelectorAll('ul.image-gallery li');
+        images.forEach(li => {
+            const originalWidth = parseInt(li.getAttribute('original-width'), 10);
+            const originalHeight = parseInt(li.getAttribute('original-height'), 10);
+            const currentHeight = li.clientHeight;
+            const expectedWidth = ( originalWidth / originalHeight ) * currentHeight ;
+            li.style.width = expectedWidth + 'px';
+
+            const imgElement = li.querySelector('a > img');
+            imgElement.style.width = expectedWidth + 'px';
+        });
+
         // Progressive loading
         let imagesToLoad = document.querySelectorAll("img[data-src]");
         const loadImages = (image) => {
             image.setAttribute("src", image.getAttribute("data-src"));
             image.onload = () => {
                 image.removeAttribute("data-src");
-                image.style = "max-width: 100%; max-height: 100%;"
             };
         };
         if ("IntersectionObserver" in window) {
+            const options = {
+                root: null, // The viewing area is the entire viewport
+                threshold: 0, // the intersection will be detected when only 10% of the element is visible in the observation area
+                rootMargin: "33% 0%", // margins added to root (1st: up and down, 2nd: left and right)
+            };
             const observer = new IntersectionObserver((items, observer) => {
                 items.forEach((item) => {
                 if (item.isIntersecting) {
@@ -169,7 +188,7 @@
             });
             imagesToLoad.forEach((img) => {
                 observer.observe(img);
-            });
+            }, options);
         } else {
             imagesToLoad.forEach((img) => {
                 loadImages(img);
@@ -187,7 +206,7 @@
             themeToggleIcon.src =  `icon-${!isDarkTheme ? 'moon' : 'sun'}.svg`;
             themeToggleIcon.style.filter = !isDarkTheme ? filterMoon : filterSun;
             let element = document.body;
-            element.classList.toggle(darkThemeClass); //,!isDarkTheme
+            element.classList.toggle(darkThemeClass);
         }
         // onload change the theme if last time was dark
         (() => localStorage.getItem('theme') === 'dark' && changeTheme())();
