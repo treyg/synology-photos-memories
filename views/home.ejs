@@ -140,7 +140,7 @@
             if (new Date(photo.date).toLocaleString().split(',')[0] != currentDate) return; %>
             <li original-width="<%= photo.resolution.width %>" original-height="<%= photo.resolution.height %>">
                 <a href="<%= photo.thumbBig %>">
-                    <img src="img.gif" data-src="<%= photo.thumbBig %>" id="img-<%= photo.id %>" style="max-width: 100%; max-height: 100%;" loading="lazy"> 
+                    <img src="placeholder-img.gif" data-src="<%= photo.thumbBig %>" id="img-<%= photo.id %>" style="max-width: 100%; max-height: 100%;" loading="lazy"> 
                     <noscript>
                         <img src="<%= photo.thumbBig %>" alt="img-<%= photo.id %>" loading="lazy"> 
                     </noscript>

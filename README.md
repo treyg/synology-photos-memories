@@ -1,12 +1,15 @@
 # Synology Photos Memories
 
-This is a node JS/docker app that fills the void for synology photos lacking a memory feature similar to Google photos. The simple solution that I've found is to use the unofficial api to fetch the photos in a given timeframe, and send an email with working web links to those photos.
+This is a node JS/docker app that fills the void for synology photos lacking a memory feature similar to Google photos. The simple solution that I've found is to use the [unofficial api](https://github.com/zeichensatz/SynologyPhotosAPI) to fetch the photos in a given timeframe, and send an email with working web links to those photos.
 
 ## Hosting on your NAS
 
 The easiest way to use this app would be to host it on your NAS using Docker
 
 ### DSM 7.2+
+
+> **Warning**
+If you have not setted up quickconnect, you should (as admin) in Control Panel -> Login Portal -> Applications and set the `photo` alias related to Synology Photos app.
 
 To install with docker with Docker using the new container manager, use the following steps:
 

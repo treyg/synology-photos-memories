@@ -36,7 +36,7 @@ async function authenticate() {
 
 async function fetchPhotos(sid) {
   const photosResponse = await fetch(
-    `https://${ip}/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail","resolution"]`
+    `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail","resolution"]`
   )
   const photosData = await photosResponse.json()
   //console.log(photosData.data.list[0])
@@ -84,7 +84,7 @@ function getThumbnailUrl(ip, sid, photo) {
       thumbnail: { cache_key }
     }
   } = photo
-  return `https://${ip}/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&version=1&method=get&mode=download&id=${id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
+  return `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&version=1&method=get&mode=download&id=${id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
 }
 
 function returnPhotoUrls(photos, sid) {
