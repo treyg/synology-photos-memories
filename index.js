@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer'
 import cron from 'node-cron'
 import express from 'express'
 import path from 'path'
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'url'
 
 dotenv.config()
 
@@ -27,17 +27,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 async function authenticate() {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
   const authResponse = await fetch(
     `https://${ip}/photo/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=${user}&passwd=${password}`
   )
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
   const authData = await authResponse.json()
   return authData.data.sid
 }
 
 async function fetchPhotos(sid) {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
   const photosResponse = await fetch(
     `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail","resolution"]`
   )
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
   const photosData = await photosResponse.json()
   //console.log(photosData.data.list[0])
   return photosData.data.list
@@ -125,7 +129,6 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-let photoUrls 
 let photosRawInfo
 async function main() {
   const sid = await authenticate()
@@ -152,11 +155,8 @@ async function main() {
       throw new Error(`Invalid sendBy value: ${sendBy}`)
   }
 
-  photoUrls = returnPhotoUrls(filteredPhotos, sid)
-  //console.log('PHOTOURLS: ' + photoUrls)
-
+  const photoUrls = returnPhotoUrls(filteredPhotos, sid)
   photosRawInfo = returnPhotosInfo(filteredPhotos, sid)
-  //console.log('\nPHOTOS INFO: ' + JSON.stringify(photosRawInfo))
 
   // Check if photoUrls is empty
   if (photoUrls.length === 0) {
@@ -200,9 +200,9 @@ switch (sendBy) {
 cron.schedule(schedule, main)
 
 app.get('/', async (req, res) => {
-  res.render('home', {urlList: photosRawInfo, sendBy: sendBy});
+  res.render('home', {urlList: photosRawInfo});
 })
 
 app.listen(port, () => {
-  console.log(`EXPRESS: ${port}`);
+  console.log(`Express port: ${port}`);
 });

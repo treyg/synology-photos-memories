@@ -1,6 +1,6 @@
 # Synology Photos Memories
 
-This is a node JS/docker app that fills the void for synology photos lacking a memory feature similar to Google photos. The simple solution that I've found is to use the [unofficial api](https://github.com/zeichensatz/SynologyPhotosAPI) to fetch the photos in a given timeframe, and send an email with working web links to those photos.
+This is a node JS/docker app that fills the void for synology photos lacking a memory feature similar to Google photos. The simple solution that I've found is to use the [unofficial api](https://github.com/zeichensatz/SynologyPhotosAPI) to fetch the photos in a given timeframe, and send an email with working web links to those photos. Furthermore NodeJS serves a web page where these photos can be accessed.
 
 ## Hosting on your NAS
 
@@ -8,10 +8,10 @@ The easiest way to use this app would be to host it on your NAS using Docker
 
 ### DSM 7.2+
 
-> **Warning**
-If you have not setted up quickconnect, you should (as admin) in Control Panel -> Login Portal -> Applications and set the `photo` alias related to Synology Photos app.
+> **Important**
+> If you have not setted up quickconnect, you should (as admin) go in Control Panel -> Login Portal -> Applications and set the `photo` alias related to Synology Photos app.
 
-To install with docker with Docker using the new container manager, use the following steps:
+To install with Docker using the new container manager app, use the following steps:
 
 1. Search for, and download the the image from the Docker registry. Select the latest tag
    ![Download the image from the docker registry](./images/step1.jpeg)
@@ -34,6 +34,7 @@ You'll need the following environment variables to run the image:
 | SEND_EMAIL_PASSWORD | sendpassword123                                          |
 | RECEIVE_EMAIL       | receiveemail@proton.me                                   |
 | EMAIL_SUBJECT       | Your Monthly Photos                                      |
+| PORT                | Your Monthly Photos in web page                          |
 
 You shouldn't need to change any other settings.
 
@@ -41,7 +42,8 @@ You shouldn't need to change any other settings.
 
 This is the url you use to connect to quickconnect. Used to build the links in each email.
 
-**Note** - this hasn't been tested with methods of NAS access outside quickconnect
+> **Note**
+> email send has been tested with quickconnect as method of NAS access, meanwhile web page has been tested with localhost.
 
 #### USER_ID:
 
@@ -75,9 +77,13 @@ The password for your send email (may require 'app password' for gmail).
 
 The email address you want the memory emails delivered to. This can be any email address/service.
 
-#### Email Subject
+#### EMAIL_SUBJECT:
 
 This can be anything you want.
+
+#### PORT:
+
+This can be any port you want (not already in use). The web page is then accessible through it.
 
 ---
 
