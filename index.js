@@ -17,7 +17,7 @@ const sendEmail = process.env.SEND_EMAIL
 const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
-const port = process.env.PORT
+const port = 8080
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -46,7 +46,7 @@ async function fetchPhotos(sid) {
   //console.log(photosData.data.list[0])
   return photosData.data.list
 }
-;``
+
 function filterPhotosByMonth(photos, month) {
   const currentYear = new Date().getFullYear()
   return photos.filter(photo => {

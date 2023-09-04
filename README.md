@@ -17,7 +17,8 @@ To install with Docker using the new container manager app, use the following st
    ![Download the image from the docker registry](./images/step1.jpeg)
 2. Go to the image and click run
 3. Change the container name if you prefer, and click next
-4. Add the following ENV variables
+4. In the `Port Settings` section, click Add and set the `Local Port` (the first textfield input) to whatever you want: it's the port you will use to access the web view of 'memories'; Then set the `Container Port` (the second texfield input) to `8080`
+5. Add the following ENV variables
 
 #### Docker config
 
@@ -34,7 +35,6 @@ You'll need the following environment variables to run the image:
 | SEND_EMAIL_PASSWORD | sendpassword123                                          |
 | RECEIVE_EMAIL       | receiveemail@proton.me                                   |
 | EMAIL_SUBJECT       | Your Monthly Photos                                      |
-| PORT                | Your Monthly Photos in web page                          |
 
 You shouldn't need to change any other settings.
 
@@ -81,17 +81,13 @@ The email address you want the memory emails delivered to. This can be any email
 
 This can be anything you want.
 
-#### PORT:
-
-This can be any port you want (not already in use). The web page is then accessible through it.
-
 ---
 
 Altogether, your env settings should look something like this:
 
 ![ENV settings](./images/env.jpeg)
 
-5. Click done
+6. Click done
 
 ---
 
