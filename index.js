@@ -17,6 +17,7 @@ const sendEmail = process.env.SEND_EMAIL
 const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
+const hostPort = process.env.PORT
 const port = 8080
 
 const app = express();
@@ -164,11 +165,12 @@ async function main() {
     return
   }
 
+  const mailHtml = photoUrls.join('<br>') + '<br><a href="//' +ip+':'+hostPort+ '" target="_blank">view all on web</a>'
   const mailOptions = {
     from: sendEmail,
     to: receiveEmail,
     subject: emailSubject,
-    html: photoUrls.join('<br>')
+    html: mailHtml
   }
 
   transporter.sendMail(mailOptions, function (error, info) {

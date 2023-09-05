@@ -35,6 +35,7 @@ You'll need the following environment variables to run the image:
 | SEND_EMAIL_PASSWORD | sendpassword123                                          |
 | RECEIVE_EMAIL       | receiveemail@proton.me                                   |
 | EMAIL_SUBJECT       | Your Monthly Photos                                      |
+| PORT                | Your Monthly Photos in web page                          |
 
 You shouldn't need to change any other settings.
 
@@ -80,6 +81,13 @@ The email address you want the memory emails delivered to. This can be any email
 #### EMAIL_SUBJECT:
 
 This can be anything you want.
+
+#### PORT:
+
+> **Important**
+> This must be the same port as `Local Port` setted in the [Port Settings section](#dsm-72).
+
+This can be any port you want (not already in use). The web page is then accessible through it.
 
 ---
 
