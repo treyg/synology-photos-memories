@@ -35,7 +35,7 @@ You'll need the following environment variables to run the image:
 | SEND_EMAIL_PASSWORD | sendpassword123                                          |
 | RECEIVE_EMAIL       | receiveemail@proton.me                                   |
 | EMAIL_SUBJECT       | Your Monthly Photos                                      |
-| PORT                | Your Monthly Photos in web page                          |
+| PORT                | Your Monthly Photos in web page ( [NB](#port) )          |
 
 You shouldn't need to change any other settings.
 
