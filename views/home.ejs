@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=0">
+    <title>Memories</title>
+    <style>
+        :root {
+            --round-corner-image : 5px;
+            --height-image : 250px;
+        }
+
+        html {
+            font-family: 'Rosario', sans-serif;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-align: -moz-center;
+            text-align: -webkit-center;
+            flex-direction: column;
+            min-height: 50vh;
+        }
+        html body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .current-date {
+            width: 100vw; 
+            text-align: center;
+            margin-left: -8px;
+        }
+
+        .image-gallery {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 6vh;
+            padding-right: 40px;
+            max-width: 100%;
+        }
+        .image-gallery > li {
+            height: var(--height-image);
+            cursor: pointer;
+            position: relative;
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: auto;
+        }
+        .image-gallery li a img {
+            -webkit-object-fit: cover;
+            object-fit: cover;
+            height: 100%;
+            min-width: 100%;
+            vertical-align: middle;
+            border-radius: var(--round-corner-image);
+        } 
+        .image-gallery::after {
+            content: "";
+            flex-grow: 999;
+        }
+        @media screen and (max-width: 576px) {
+            :root {
+                --height-image : 100px;
+            }
+            .image-gallery {
+                gap: 5px !important;
+                padding-right: 30px !important;
+                padding-left: 30px !important;
+            }
+
+            .btn-dark-toggler {
+                margin-top: 40px !important;
+            }
+            #themeToggleIcon {
+                width: 10vw !important;
+            }
+        }
+
+        .dark{
+            background-color: #222;
+            color: #e6e6e6;
+        }
+
+        .btn-dark-toggler {
+            position: absolute; 
+            right: 0; 
+            top: 0; 
+            margin: 3vw;
+            margin-top: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        img[data-src] {
+            -webkit-filter: blur(0.2em);
+            filter: blur(0.2em);
+        }
+
+        img {
+            -webkit-filter: blur(0em);
+            filter: blur(0em);
+            -webkit-transition: -webkit-filter 0.5s ease;
+            transition: -webkit-filter 0.5s ease;
+            transition: filter 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="width: 75vw; margin-bottom: 4vh;" >
+            <h1 >Synology Memories</h1>
+        </div>
+    </header>
+
+    <button class="btn-dark-toggler" onclick="changeTheme()">
+        <img src="icon-sun.svg" alt="SVG Icon" id="themeToggleIcon" style="width: 3.5vw; filter:invert(72%) sepia(57%) saturate(514%) hue-rotate(341deg) brightness(102%) contrast(102%)">
+    </button>
+
+    <% const uniqueDates = new Set();
+    urlList.forEach(photo => {
+        formattedDate = new Date(photo.date).toLocaleString().split(',')[0]
+        uniqueDates.add(formattedDate);
+    })
+
+    uniqueDates.forEach(currentDate => {
+        const [month, day, year] = currentDate.split("/").map(Number);
+        const currentDateObj = new Date(year, month - 1, day);
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        const formattedCurrentDate = currentDateObj.toLocaleDateString('en-US', options);
+    %>
+        <strong class="current-date">📌 <%=formattedCurrentDate%></strong>
+        <ul class="image-gallery">
+        <% urlList.forEach(photo => { 
+            if (new Date(photo.date).toLocaleString().split(',')[0] != currentDate) return; %>
+            <li original-width="<%= photo.resolution.width %>" original-height="<%= photo.resolution.height %>">
+                <a href="<%= photo.thumbBig %>">
+                    <img src="placeholder-img.gif" data-src="<%= photo.thumbBig %>" id="img-<%= photo.id %>" style="max-width: 100%; max-height: 100%;" loading="lazy"> 
+                    <noscript>
+                        <img src="<%= photo.thumbBig %>" alt="img-<%= photo.id %>" loading="lazy"> 
+                    </noscript>
+                </a>
+            </li>
+        <% }) %>
+        </ul>
+    <% }) %>
+
+    <script>
+        // placeholder
+        const images = document.querySelectorAll('ul.image-gallery li');
+        images.forEach(li => {
+            const originalWidth = parseInt(li.getAttribute('original-width'), 10);
+            const originalHeight = parseInt(li.getAttribute('original-height'), 10);
+            const currentHeight = li.clientHeight;
+            const expectedWidth = ( originalWidth / originalHeight ) * currentHeight ;
+            li.style.width = expectedWidth + 'px';
+
+            const imgElement = li.querySelector('a > img');
+            imgElement.style.width = expectedWidth + 'px';
+        });
+
+        // Progressive loading
+        let imagesToLoad = document.querySelectorAll("img[data-src]");
+        const loadImages = (image) => {
+            image.setAttribute("src", image.getAttribute("data-src"));
+            image.onload = () => {
+                image.removeAttribute("data-src");
+            };
+        };
+        if ("IntersectionObserver" in window) {
+            const options = {
+                root: null, // The viewing area is the entire viewport
+                threshold: 0, // the intersection will be detected when only 10% of the element is visible in the observation area
+                rootMargin: "33% 0%", // margins added to root (1st: up and down, 2nd: left and right)
+            };
+            const observer = new IntersectionObserver((items, observer) => {
+                items.forEach((item) => {
+                if (item.isIntersecting) {
+                    loadImages(item.target);
+                    observer.unobserve(item.target);
+                }
+                });
+            });
+            imagesToLoad.forEach((img) => {
+                observer.observe(img);
+            }, options);
+        } else {
+            imagesToLoad.forEach((img) => {
+                loadImages(img);
+            });
+        }
+
+        // Light-Dark Theme
+        const darkThemeClass = 'dark';
+        const themeToggleIcon = document.getElementById('themeToggleIcon');
+        const filterMoon = 'invert(97%) sepia(15%) saturate(1325%) hue-rotate(186deg) brightness(129%) contrast(100%)'; // #FFFFFF
+        const filterSun = 'invert(72%) sepia(57%) saturate(514%) hue-rotate(341deg) brightness(102%) contrast(102%)'; // #FFBB52
+        function changeTheme() {
+            let isDarkTheme = document.body.classList.contains(darkThemeClass);
+            localStorage.setItem('theme', isDarkTheme ? 'light' : 'dark');
+            themeToggleIcon.src =  `icon-${!isDarkTheme ? 'moon' : 'sun'}.svg`;
+            themeToggleIcon.style.filter = !isDarkTheme ? filterMoon : filterSun;
+            let element = document.body;
+            element.classList.toggle(darkThemeClass);
+        }
+        // onload change the theme if last time was dark
+        (() => localStorage.getItem('theme') === 'dark' && changeTheme())();
+    </script>
+</body>
+</html>

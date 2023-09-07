@@ -2,6 +2,9 @@ import fetch from 'node-fetch'
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
 import cron from 'node-cron'
+import express from 'express'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 dotenv.config()
 
@@ -14,24 +17,37 @@ const sendEmail = process.env.SEND_EMAIL
 const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
+const hostPort = process.env.PORT
+const port = 8080
+
+const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 async function authenticate() {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
   const authResponse = await fetch(
     `https://${ip}/photo/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=${user}&passwd=${password}`
   )
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
   const authData = await authResponse.json()
   return authData.data.sid
 }
 
 async function fetchPhotos(sid) {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
   const photosResponse = await fetch(
-    `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail"]`
+    `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail","resolution"]`
   )
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
   const photosData = await photosResponse.json()
   //console.log(photosData.data.list[0])
   return photosData.data.list
 }
-;``
+
 function filterPhotosByMonth(photos, month) {
   const currentYear = new Date().getFullYear()
   return photos.filter(photo => {
@@ -73,7 +89,7 @@ function getThumbnailUrl(ip, sid, photo) {
       thumbnail: { cache_key }
     }
   } = photo
-  return `https://${ip}/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&version=1&method=get&mode=download&id=${id}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
+  return `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&version=1&method=get&mode=download&id=${id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
 }
 
 function returnPhotoUrls(photos, sid) {
@@ -89,6 +105,23 @@ function returnPhotoUrls(photos, sid) {
   })
 }
 
+function returnPhotosInfo(photos, sid) {
+  return photos.map(photo => {
+    const { additional, ...rest } = photo;
+    return {
+      ...rest,
+      resolution: additional.resolution,
+      thumbBig: getThumbnailUrl(ip, sid, photo),
+      thumbSmall: getThumbnailUrl(ip, sid, photo).replace('&size=xl', '&size=m'),
+      date: retrieveData(photo)
+    };
+  });  
+}
+function retrieveData(photo) {
+  const { time } = photo
+  return new Date(time * 1000) 
+}
+
 const transporter = nodemailer.createTransport({
   service: serviceName,
   auth: {
@@ -97,6 +130,7 @@ const transporter = nodemailer.createTransport({
   }
 })
 
+let photosRawInfo
 async function main() {
   const sid = await authenticate()
   const photos = await fetchPhotos(sid)
@@ -123,6 +157,7 @@ async function main() {
   }
 
   const photoUrls = returnPhotoUrls(filteredPhotos, sid)
+  photosRawInfo = returnPhotosInfo(filteredPhotos, sid)
 
   // Check if photoUrls is empty
   if (photoUrls.length === 0) {
@@ -130,11 +165,12 @@ async function main() {
     return
   }
 
+  const mailHtml = photoUrls.join('<br>') + '<br><a href="//' +ip+':'+hostPort+ '" target="_blank">view all on web</a>'
   const mailOptions = {
     from: sendEmail,
     to: receiveEmail,
     subject: emailSubject,
-    html: photoUrls.join('<br>')
+    html: mailHtml
   }
 
   transporter.sendMail(mailOptions, function (error, info) {
@@ -146,7 +182,7 @@ async function main() {
   })
 }
 
-//main().catch(console.error)
+main().catch(console.error)
 
 let schedule
 switch (sendBy) {
@@ -164,3 +200,11 @@ switch (sendBy) {
 }
 
 cron.schedule(schedule, main)
+
+app.get('/', async (req, res) => {
+  res.render('home', {urlList: photosRawInfo});
+})
+
+app.listen(port, () => {
+  console.log(`Express port: ${port}`);
+});
