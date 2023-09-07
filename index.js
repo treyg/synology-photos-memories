@@ -18,7 +18,7 @@ const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
 const hostPort = process.env.PORT
-const port = 8080
+const port = 9393
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -165,7 +165,9 @@ async function main() {
     return
   }
 
-  const mailHtml = photoUrls.join('<br>') + '<br><a href="//' +ip+':'+hostPort+ '" target="_blank">view all on web</a>'
+  const ipAddressWithoutPort = ip.split(':')[0];
+  const mailHtml = `${photoUrls.join('<br>')}<br><a href="//${ipAddressWithoutPort}:${hostPort}" target="_blank">View all on web</a>`;
+  
   const mailOptions = {
     from: sendEmail,
     to: receiveEmail,

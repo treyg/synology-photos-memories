@@ -17,7 +17,7 @@ To install with Docker using the new container manager app, use the following st
    ![Download the image from the docker registry](./images/step1.jpeg)
 2. Go to the image and click run
 3. Change the container name if you prefer, and click next
-4. In the `Port Settings` section, click Add and set the `Local Port` (the first textfield input) to whatever you want: it's the port you will use to access the web view of 'memories'; Then set the `Container Port` (the second texfield input) to `8080`
+4. In the `Port Settings` section, click Add and set the `Local Port` (the first textfield input) to whatever you want: it's the port you will use to access the web view of 'memories'; Then set the `Container Port` (the second texfield input) to `9393`
 5. Add the following ENV variables
 
 #### Docker config
@@ -44,7 +44,7 @@ You shouldn't need to change any other settings.
 This is the url you use to connect to quickconnect. Used to build the links in each email.
 
 > **Note**
-> email send has been tested with quickconnect as method of NAS access, meanwhile web page has been tested with localhost.
+> Email send and webpage view have only been tested with quickconnect enabled, so NAS_IP should point to your quickconnect url.
 
 #### USER_ID:
 
@@ -85,7 +85,7 @@ This can be anything you want.
 #### PORT:
 
 > **Important**
-> This must be the same port as `Local Port` setted in the [Port Settings section](#dsm-72).
+> This must be the same port as the `Local Port` set in the [Port Settings section](#dsm-72).
 
 This can be any port you want (not already in use). The web page is then accessible through it.
 
