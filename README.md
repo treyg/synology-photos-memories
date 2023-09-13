@@ -1,6 +1,6 @@
 # Synology Photos Memories
 
-This is a node JS/docker app that fills the void for synology photos lacking a memory feature similar to Google photos. The simple solution that I've found is to use the [unofficial api](https://github.com/zeichensatz/SynologyPhotosAPI) to fetch the photos in a given timeframe, and send an email with working web links to those photos. Furthermore NodeJS serves a web page where these photos can be accessed.
+This is a Node JS/Docker app that fills the void for synology photos lacking a memory feature similar to Google Photos. The simple solution that I've found is to use the [unofficial api](https://github.com/zeichensatz/SynologyPhotosAPI) to fetch the photos in a given timeframe, and send an email with working web links to those photos. Furthermore, NodeJS serves a web page where these photos can be accessed.
 
 ## Hosting on your NAS
 
@@ -9,7 +9,7 @@ The easiest way to use this app would be to host it on your NAS using Docker
 ### DSM 7.2+
 
 > **Important**
-> If you have not setted up quickconnect, you should (as admin) go in Control Panel -> Login Portal -> Applications and set the `photo` alias related to Synology Photos app.
+> If you have not set up quickconnect, you should (as admin) go in Control Panel -> Login Portal -> Applications and set the `photo` alias related to Synology Photos app.
 
 To install with Docker using the new container manager app, use the following steps:
 
@@ -17,7 +17,7 @@ To install with Docker using the new container manager app, use the following st
    ![Download the image from the docker registry](./images/step1.jpeg)
 2. Go to the image and click run
 3. Change the container name if you prefer, and click next
-4. In the `Port Settings` section, click Add and set the `Local Port` (the first textfield input) to whatever you want: it's the port you will use to access the web view of 'memories'; Then set the `Container Port` (the second texfield input) to `9393`
+4. In the `Port Settings` section, click Add and set the `Local Port` (the first textfield input) to whatever you want: it's the port you will use to access the web view of 'memories'; Then set the `Container Port` (the second textfield input) to `8080`
 5. Add the following ENV variables
 
 #### Docker config
@@ -56,7 +56,7 @@ Your password for quickconnect
 
 #### SERVICE_NAME:
 
-This the the service provider of the email you'll use for your memories to be sent from. Gmail is probably the easiest, but you may need to add an 'app password' to allow access if you have 'allow less secure apps' enabled in your settings.
+This is the service provider of the email you'll use for your memories to be sent from. Gmail is probably the easiest, but you may need to add an 'app password' to allow access if you have 'allow less secure apps' enabled in your settings.
 
 You can do so at myaccount.google.com/apppasswords
 
@@ -68,7 +68,7 @@ This is how frequently you want a memory email. The options are 'day', 'week', o
 
 #### SEND_EMAIL:
 
-Your email with the same service provider you selected earlier that your memories email will be sent from.
+This is the email address from the same service provider you selected earlier, from which your memory emails will be sent.
 
 #### SEND_EMAIL_PASSWORD:
 
