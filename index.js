@@ -18,7 +18,7 @@ const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
 const hostPort = process.env.PORT
-const port = 9393
+const port = 8080
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
