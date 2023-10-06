@@ -38,15 +38,33 @@ async function authenticate() {
 }
 
 async function fetchPhotos(sid) {
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-  const photosResponse = await fetch(
-    `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=0&limit=5000&_sid=${sid}&additional=["thumbnail","resolution"]`
-  )
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
-  const photosData = await photosResponse.json()
-  //console.log(photosData.data.list[0])
-  return photosData.data.list
-}
+   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+ 
+   let offset = 0;
+   const limit = 5000;
+   let allPhotos = [];
+   let hasMore = true;
+ 
+   while (hasMore) {
+     const photosResponse = await fetch(
+       `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=${offset}&limit=${limit}&_sid=${sid}&additional=["thumbnail","resolution"]`
+     );
+
+     const photosData = await photosResponse.json();
+     if (photosData.data && photosData.data.list && photosData.data.list.length > 0) {
+       allPhotos = allPhotos.concat(photosData.data.list);
+       offset += limit;
+     } else {
+       hasMore = false;
+     }
+   }
+ 
+   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
+ 
+   console.log(`Found ${allPhotos.length} photos.`);
+   return allPhotos;
+ }
+ 
 
 function filterPhotosByMonth(photos, month) {
   const currentYear = new Date().getFullYear()
