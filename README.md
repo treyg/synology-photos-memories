@@ -44,7 +44,7 @@ You shouldn't need to change any other settings.
 This is the url you use to connect to quickconnect. Used to build the links in each email.
 
 > **Note**
-> Email send and webpage view have only been tested with quickconnect enabled, so NAS_IP should point to your quickconnect url.
+> Email send and webpage view have only been tested with quickconnect enabled, so NAS_IP should point to your quickconnect url. Other's have suggested it works the same with `http:<yourlocalport>:5001`
 
 #### USER_ID:
 
