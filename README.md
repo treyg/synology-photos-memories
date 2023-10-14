@@ -24,18 +24,20 @@ To install with Docker using the new container manager app, use the following st
 
 You'll need the following environment variables to run the image:
 
-| Key                 | Value                                                    |
-| ------------------- | -------------------------------------------------------- |
-| NAS_IP              | yournasip.yourquickconnectid.direct.quickconnect.to:5001 |
-| USER_ID             | MyID                                                     |
-| USER_PASSWORD       | password123                                              |
-| SERVICE_NAME        | gmail                                                    |
-| SEND_BY             | month                                                    |
-| SEND_EMAIL          | emailtosendfrom@gmail.com                                |
-| SEND_EMAIL_PASSWORD | sendpassword123                                          |
-| RECEIVE_EMAIL       | receiveemail@proton.me                                   |
-| EMAIL_SUBJECT       | Your Monthly Photos                                      |
-| PORT                | Your Monthly Photos in web page ( [NB](#port) )          |
+| Key                 | Value                                                    | Optional |
+| ------------------- | -------------------------------------------------------- | -------- |
+| NAS_IP              | yournasip.yourquickconnectid.direct.quickconnect.to:5001 | No       |
+| USER_ID             | MyID                                                     | No       |
+| USER_PASSWORD       | password123                                              | No       |
+| SERVICE_NAME        | gmail                                                    | No       |
+| SEND_BY             | month                                                    | No       |
+| SEND_EMAIL          | emailtosendfrom@gmail.com                                | No       |
+| SEND_EMAIL_PASSWORD | sendpassword123                                          | No       |
+| RECEIVE_EMAIL       | receiveemail@proton.me                                   | No       |
+| EMAIL_SUBJECT       | Your Monthly Photos                                      | Yes       |
+| PORT                | Your Monthly Photos in web page ( [NB](#port) )          | No       |
+| FOTO_TEAM           | Optional value for foto space. Set to `true` if  you only have photos in shared space not in your personal space        | Yes      |
+
 
 You shouldn't need to change any other settings.
 
@@ -88,6 +90,9 @@ This can be anything you want.
 > This must be the same port as the `Local Port` set in the [Port Settings section](#dsm-72).
 
 This can be any port you want (not already in use). The web page is then accessible through it.
+
+### FOTO_TEAM
+Optional boolean value in case you only have photos in your shared space. 
 
 ---
 
