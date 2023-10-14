@@ -18,6 +18,7 @@ const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
 const hostPort = process.env.PORT
+const fotoSpace = process.env.FOTO_TEAM === 'true' ? 'fotoTeam' : 'foto';
 const port = 8080
 
 const app = express();
@@ -47,7 +48,7 @@ async function fetchPhotos(sid) {
  
    while (hasMore) {
      const photosResponse = await fetch(
-       `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Browse.Item&version=1&method=list&type=photo&offset=${offset}&limit=${limit}&_sid=${sid}&additional=["thumbnail","resolution"]`
+       `https://${ip}/photo/webapi/entry.cgi?api=SYNO.${fotoSpace}.Browse.Item&version=1&method=list&type=photo&offset=${offset}&limit=${limit}&_sid=${sid}&additional=["thumbnail","resolution"]`
      );
 
      const photosData = await photosResponse.json();
@@ -107,7 +108,7 @@ function getThumbnailUrl(ip, sid, photo) {
       thumbnail: { cache_key }
     }
   } = photo
-  return `https://${ip}/photo/webapi/entry.cgi?api=SYNO.Foto.Thumbnail&version=1&method=get&mode=download&id=${id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
+  return `https://${ip}/photo/webapi/entry.cgi?api=SYNO.${fotoSpace}.Thumbnail&version=1&method=get&mode=download&id=${id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
 }
 
 function returnPhotoUrls(photos, sid) {
