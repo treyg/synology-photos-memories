@@ -18,7 +18,7 @@ const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
 const hostPort = process.env.PORT
-const fotoSpace = process.env.FOTO_TEAM === 'true' ? 'fotoTeam' : 'foto';
+const fotoSpace = process.env.FOTO_TEAM === 'true' ? 'fotoTeam' : 'Foto';
 const port = 8080
 
 const app = express();
