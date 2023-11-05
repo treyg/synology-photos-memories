@@ -74,7 +74,7 @@ This is the email address from the same service provider you selected earlier, f
 
 #### SEND_EMAIL_PASSWORD:
 
-The password for your send email (may require 'app password' for gmail).
+The password for your send email (may require 'app password' for gmail). If you have enabled 2-factor authentication you need to generate an app-specific password and use that in place of your actual password.To do that, go to [My App Passwords](https://myaccount.google.com/apppasswords).
 
 #### RECEIVE_EMAIL:
 
