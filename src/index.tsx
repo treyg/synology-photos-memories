@@ -47,10 +47,20 @@ const Layout: FC = ({ children }) => (
     <head>
       <title>Synology Photo Memories</title>
       <link rel="stylesheet" href="/public/styles.css" />
+      <meta name="color-scheme" content="dark light" />
     </head>
     <body>
       <div class="container">
-        <h1>Synology Photo Memories</h1>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="Toggle theme">
+          <img src="/public/icon-sun.svg" class="theme-icon sun" alt="Light mode" />
+          <img src="/public/icon-moon.svg" class="theme-icon moon" alt="Dark mode" />
+        </button>
+        <div class="header">
+          <h1>Synology Photo Memories</h1>
+        </div>
         {children}
       </div>
       <script src="/public/main.js"></script>
