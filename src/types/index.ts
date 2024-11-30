@@ -1,17 +1,30 @@
 export interface Photo {
-  id: string
+  id: number
   filename: string
   filesize: number
   time: number
-  thumbnail_size: number
+  folder_id: number
+  owner_user_id: number
   type: string
-  additional?: {
+  indexed_time: number
+  additional: {
+    thumbnail?: {
+      cache_key: string
+      m: string
+      preview: string
+      sm: string
+      unit_id: number
+      xl: string
+    }
     resolution?: {
       height: number
       width: number
     }
     orientation?: number
+    video_convert?: any
+    video_meta?: any
   }
+  thumbnailUrl?: string
 }
 
 export interface SynoResponse<T> {

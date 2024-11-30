@@ -1,7 +1,7 @@
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
-import { FC, html } from 'hono/jsx'
+import { FC } from 'hono/jsx'
 import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
 import cron from 'node-cron'
@@ -93,9 +93,11 @@ app.get('/api/photos', async c => {
         throw new Error(`Invalid sendBy value: ${sendBy}`)
     }
 
-    const photoUrls = filteredPhotos.map(photo =>
-      synoService.getThumbnailUrl(sid, photo)
-    )
+    // Only include photos that have thumbnail URLs
+    const photoUrls = filteredPhotos
+      .map(photo => photo.thumbnailUrl)
+      .filter((url): url is string => url !== undefined)
+
     return c.json({ photos: filteredPhotos, urls: photoUrls })
   } catch (error) {
     console.error('Error fetching photos:', error)
@@ -145,9 +147,11 @@ async function sendPhotoEmail() {
         throw new Error(`Invalid sendBy value: ${sendBy}`)
     }
 
-    const photoUrls = filteredPhotos.map(photo =>
-      synoService.getThumbnailUrl(sid, photo)
-    )
+    // Only include photos that have thumbnail URLs
+    const photoUrls = filteredPhotos
+      .map(photo => photo.thumbnailUrl)
+      .filter((url): url is string => url !== undefined)
+
     await emailService.sendPhotoEmail(
       photoUrls,
       process.env.NAS_IP!,
