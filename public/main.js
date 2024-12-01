@@ -25,6 +25,68 @@ function initTheme() {
   }
 }
 
+// Lightbox functionality
+let currentPhotoIndex = 0;
+let currentGroupPhotos = [];
+
+function openLightbox(photo, groupPhotos) {
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  
+  currentGroupPhotos = groupPhotos;
+  currentPhotoIndex = groupPhotos.findIndex(p => p.thumbnailUrl === photo.thumbnailUrl);
+  
+  lightboxImg.src = photo.thumbnailUrl;
+  lightboxImg.alt = `Photo from ${new Date(photo.time * 1000).toLocaleDateString()}`;
+  lightbox.classList.add('active');
+  
+  // Prevent scrolling on the body when lightbox is open
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById('lightbox');
+  lightbox.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function showNextPhoto() {
+  if (currentPhotoIndex < currentGroupPhotos.length - 1) {
+    currentPhotoIndex++;
+    const nextPhoto = currentGroupPhotos[currentPhotoIndex];
+    const lightboxImg = document.getElementById('lightbox-img');
+    lightboxImg.src = nextPhoto.thumbnailUrl;
+    lightboxImg.alt = `Photo from ${new Date(nextPhoto.time * 1000).toLocaleDateString()}`;
+  }
+}
+
+function showPrevPhoto() {
+  if (currentPhotoIndex > 0) {
+    currentPhotoIndex--;
+    const prevPhoto = currentGroupPhotos[currentPhotoIndex];
+    const lightboxImg = document.getElementById('lightbox-img');
+    lightboxImg.src = prevPhoto.thumbnailUrl;
+    lightboxImg.alt = `Photo from ${new Date(prevPhoto.time * 1000).toLocaleDateString()}`;
+  }
+}
+
+// Handle keyboard navigation
+function handleKeyPress(event) {
+  if (!document.getElementById('lightbox').classList.contains('active')) return;
+  
+  switch (event.key) {
+    case 'Escape':
+      closeLightbox();
+      break;
+    case 'ArrowRight':
+      showNextPhoto();
+      break;
+    case 'ArrowLeft':
+      showPrevPhoto();
+      break;
+  }
+}
+
 async function fetchPhotos() {
   try {
     const response = await fetch('/api/photos')
@@ -58,14 +120,12 @@ async function fetchPhotos() {
 
         const img = document.createElement('img')
         img.src = photo.thumbnailUrl
-        img.alt = `Photo from ${new Date(
-          photo.time * 1000
-        ).toLocaleDateString()}`
+        img.alt = `Photo from ${new Date(photo.time * 1000).toLocaleDateString()}`
         img.className = 'photo'
 
-        // Add click handler to open full-size photo
+        // Update click handler to use lightbox
         img.addEventListener('click', () => {
-          window.open(photo.thumbnailUrl, '_blank')
+          openLightbox(photo, group.photos)
         })
 
         photoDiv.appendChild(img)
@@ -92,4 +152,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme)
   }
+
+  // Add lightbox event listeners
+  document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+  document.querySelector('.lightbox-next').addEventListener('click', showNextPhoto);
+  document.querySelector('.lightbox-prev').addEventListener('click', showPrevPhoto);
+  document.addEventListener('keydown', handleKeyPress);
+  
+  // Close lightbox when clicking outside the image
+  document.getElementById('lightbox').addEventListener('click', (e) => {
+    if (e.target.id === 'lightbox') {
+      closeLightbox();
+    }
+  });
 })

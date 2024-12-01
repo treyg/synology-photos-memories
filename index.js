@@ -18,60 +18,68 @@ const sendEmailPassword = process.env.SEND_EMAIL_PASSWORD
 const receiveEmail = process.env.RECEIVE_EMAIL
 const emailSubject = process.env.EMAIL_SUBJECT
 const hostPort = process.env.PORT
-const fotoSpace = process.env.FOTO_TEAM === 'true' ? 'FotoTeam' : 'Foto';
+const fotoSpace = process.env.FOTO_TEAM === 'true' ? 'FotoTeam' : 'Foto'
 const port = 8080
 
-const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+const app = express()
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+app.use(express.static(path.join(__dirname, 'public')))
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
 
 async function authenticate() {
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; 
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
   const authResponse = await fetch(
-    `https://${ip}/photo/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=${encodeURIComponent(user)}&passwd=${encodeURIComponent(password)}`
+    `https://${ip}/photo/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=${encodeURIComponent(
+      user
+    )}&passwd=${encodeURIComponent(password)}`
   )
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1
   const authData = await authResponse.json()
   return authData.data.sid
 }
 
 async function fetchPhotos(sid) {
-   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
- 
-   let offset = 0;
-   const limit = 5000;
-   let allPhotos = [];
-   let hasMore = true;
- 
-   while (hasMore) {
-     const photosResponse = await fetch(
-       `https://${ip}/photo/webapi/entry.cgi?api=SYNO.${fotoSpace}.Browse.Item&version=1&method=list&type=photo&offset=${offset}&limit=${limit}&_sid=${sid}&additional=["thumbnail","resolution"]`
-     );
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
 
-     const photosData = await photosResponse.json();
-     if (photosData.data && photosData.data.list && photosData.data.list.length > 0) {
-       allPhotos = allPhotos.concat(photosData.data.list);
-       offset += limit;
-     } else {
-       hasMore = false;
-     }
-   }
- 
-   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
- 
-   console.log(`Found ${allPhotos.length} photos.`);
-   return allPhotos;
- }
- 
+  let offset = 0
+  const limit = 5000
+  let allPhotos = []
+  let hasMore = true
+
+  while (hasMore) {
+    const photosResponse = await fetch(
+      `https://${ip}/photo/webapi/entry.cgi?api=SYNO.${fotoSpace}.Browse.Item&version=1&method=list&type=photo&offset=${offset}&limit=${limit}&_sid=${sid}&additional=["thumbnail","resolution"]`
+    )
+
+    const photosData = await photosResponse.json()
+    if (
+      photosData.data &&
+      photosData.data.list &&
+      photosData.data.list.length > 0
+    ) {
+      allPhotos = allPhotos.concat(photosData.data.list)
+      offset += limit
+    } else {
+      hasMore = false
+    }
+  }
+
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1
+
+  console.log(`Found ${allPhotos.length} photos.`)
+  return allPhotos
+}
 
 function filterPhotosByMonth(photos, month) {
   const currentYear = new Date().getFullYear()
   return photos.filter(photo => {
     const takenDate = new Date(photo.time * 1000)
-    return takenDate.getMonth() + 1 === month && takenDate.getFullYear() < currentYear
+    return (
+      takenDate.getMonth() + 1 === month &&
+      takenDate.getFullYear() < currentYear
+    )
   })
 }
 
@@ -85,7 +93,9 @@ function filterPhotosByWeek(photos, week) {
   const currentYear = new Date().getFullYear()
   return photos.filter(photo => {
     const takenDate = new Date(photo.time * 1000)
-    return getWeekNumber(takenDate) === week && takenDate.getFullYear() < currentYear
+    return (
+      getWeekNumber(takenDate) === week && takenDate.getFullYear() < currentYear
+    )
   })
 }
 
@@ -108,7 +118,9 @@ function getThumbnailUrl(ip, sid, photo) {
       thumbnail: { cache_key }
     }
   } = photo
-  return `https://${ip}/photo/webapi/entry.cgi?api=SYNO.${fotoSpace}.Thumbnail&version=1&method=get&mode=download&id=${id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]}&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
+  return `https://${ip}/photo/webapi/entry.cgi?api=SYNO.${fotoSpace}.Thumbnail&version=1&method=get&mode=download&id=${
+    id == cache_key.split('_')[0] ? id : cache_key.split('_')[0]
+  }&type=unit&size=xl&cache_key=${cache_key}&_sid=${sid}`
 }
 
 function returnPhotoUrls(photos, sid) {
@@ -126,19 +138,22 @@ function returnPhotoUrls(photos, sid) {
 
 function returnPhotosInfo(photos, sid) {
   return photos.map(photo => {
-    const { additional, ...rest } = photo;
+    const { additional, ...rest } = photo
     return {
       ...rest,
       resolution: additional.resolution,
       thumbBig: getThumbnailUrl(ip, sid, photo),
-      thumbSmall: getThumbnailUrl(ip, sid, photo).replace('&size=xl', '&size=m'),
+      thumbSmall: getThumbnailUrl(ip, sid, photo).replace(
+        '&size=xl',
+        '&size=m'
+      ),
       date: retrieveData(photo)
-    };
-  });  
+    }
+  })
 }
 function retrieveData(photo) {
   const { time } = photo
-  return new Date(time * 1000) 
+  return new Date(time * 1000)
 }
 
 const transporter = nodemailer.createTransport({
@@ -184,9 +199,11 @@ async function main() {
     return
   }
 
-  const ipAddressWithoutPort = ip.split(':')[0];
-  const mailHtml = `${photoUrls.join('<br>')}<br><a href="//${ipAddressWithoutPort}:${hostPort}" target="_blank">View all on web</a>`;
-  
+  const ipAddressWithoutPort = ip.split(':')[0]
+  const mailHtml = `${photoUrls.join(
+    '<br>'
+  )}<br><a href="//${ipAddressWithoutPort}:${hostPort}" target="_blank">View all on web</a>`
+
   const mailOptions = {
     from: sendEmail,
     to: receiveEmail,
@@ -223,9 +240,9 @@ switch (sendBy) {
 cron.schedule(schedule, main)
 
 app.get('/', async (req, res) => {
-  res.render('home', {urlList: photosRawInfo});
+  res.render('home', { urlList: photosRawInfo })
 })
 
 app.listen(port, () => {
-  console.log(`Express port: ${port}`);
-});
+  console.log(`Express port: ${port}`)
+})

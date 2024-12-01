@@ -73,6 +73,14 @@ const Layout: FC = ({ children }) => (
         </div>
         {children}
       </div>
+      <div id="lightbox" class="lightbox">
+        <button class="lightbox-close">&times;</button>
+        <button class="lightbox-prev">&lt;</button>
+        <button class="lightbox-next">&gt;</button>
+        <div class="lightbox-content">
+          <img id="lightbox-img" src="" alt="" />
+        </div>
+      </div>
       <script src="/public/main.js"></script>
     </body>
   </html>
