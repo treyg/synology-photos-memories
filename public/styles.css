@@ -95,14 +95,27 @@ h1 {
 
 [data-theme='dark'] .theme-icon.sun {
   opacity: 1;
-  filter: invert(80%) sepia(40%) saturate(1000%) hue-rotate(360deg) brightness(105%) contrast(105%);
+  filter: invert(80%) sepia(40%) saturate(1000%) hue-rotate(360deg)
+    brightness(105%) contrast(105%);
 }
 
 [data-theme='dark'] .theme-icon.moon {
   opacity: 0;
 }
 
-#photos {
+.photo-group {
+  margin-bottom: 3rem;
+}
+
+.group-title {
+  color: var(--text-color);
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--text-color);
+}
+
+.photos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
@@ -114,21 +127,31 @@ h1 {
   border-radius: 8px;
   box-shadow: 0 2px 4px var(--card-shadow);
   overflow: hidden;
-  transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
 }
 
 .photo-container:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 8px var(--card-shadow);
 }
 
 .photo {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  transition: transform 0.2s ease-in-out;
+}
+
+.photo-container:hover .photo {
+  transform: scale(1.05);
 }
 
 .error {
   color: #dc3545;
   text-align: center;
   padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 8px;
+  margin: 1rem;
 }

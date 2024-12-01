@@ -20,10 +20,6 @@ function toggleTheme() {
 
 function initTheme() {
   const savedTheme = localStorage.getItem('theme')
-  const systemPrefersDark = window.matchMedia(
-    '(prefers-color-scheme: dark)'
-  ).matches
-
   if (savedTheme) {
     setTheme(savedTheme)
   }
@@ -41,17 +37,43 @@ async function fetchPhotos() {
     const photosContainer = document.getElementById('photos')
     photosContainer.innerHTML = ''
 
-    data.urls.forEach((url, index) => {
-      const img = document.createElement('img')
-      img.src = url
-      img.alt = `Photo ${index + 1}`
-      img.className = 'photo'
+    data.groups.forEach(group => {
+      // Create group container
+      const groupContainer = document.createElement('div')
+      groupContainer.className = 'photo-group'
 
-      const photoDiv = document.createElement('div')
-      photoDiv.className = 'photo-container'
-      photoDiv.appendChild(img)
+      // Add group title
+      const groupTitle = document.createElement('h2')
+      groupTitle.className = 'group-title'
+      groupTitle.textContent = group.title
+      groupContainer.appendChild(groupTitle)
 
-      photosContainer.appendChild(photoDiv)
+      // Add photos grid
+      const photosGrid = document.createElement('div')
+      photosGrid.className = 'photos-grid'
+
+      group.photos.forEach(photo => {
+        const photoDiv = document.createElement('div')
+        photoDiv.className = 'photo-container'
+
+        const img = document.createElement('img')
+        img.src = photo.thumbnailUrl
+        img.alt = `Photo from ${new Date(
+          photo.time * 1000
+        ).toLocaleDateString()}`
+        img.className = 'photo'
+
+        // Add click handler to open full-size photo
+        img.addEventListener('click', () => {
+          window.open(photo.thumbnailUrl, '_blank')
+        })
+
+        photoDiv.appendChild(img)
+        photosGrid.appendChild(photoDiv)
+      })
+
+      groupContainer.appendChild(photosGrid)
+      photosContainer.appendChild(groupContainer)
     })
   } catch (error) {
     console.error('Error:', error)

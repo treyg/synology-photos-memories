@@ -69,49 +69,66 @@ export class SynologyService {
       })
       const infoData = await infoResponse.json()
 
-      const url = `${this.ip}/webapi/entry.cgi?api=SYNO.${this.fotoSpace}.Browse.Item&version=1&method=list&additional=["thumbnail","resolution","orientation","video_convert","video_meta"]&type=photo&sort_by=takentime&sort_direction=desc&offset=0&limit=500&_sid=${sid}`
-      console.log('Fetching photos from URL:', url)
+      const batchSize = 500
+      let offset = 0
+      let allPhotos: Photo[] = []
+      let hasMore = true
 
-      const response = await fetch(url, {
-        agent: this.ip.startsWith('https://') ? agent : undefined
-      })
+      while (hasMore) {
+        const url = `${this.ip}/webapi/entry.cgi?api=SYNO.${this.fotoSpace}.Browse.Item&version=1&method=list&additional=["thumbnail","resolution","orientation","video_convert","video_meta"]&type=photo&sort_by=takentime&sort_direction=desc&offset=${offset}&limit=${batchSize}&_sid=${sid}`
+        console.log(`Fetching photos batch from offset ${offset}`)
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const rawResponse = await response.text()
-
-      try {
-        const data = JSON.parse(rawResponse) as SynoResponse<{ list: Photo[] }>
-
-        if (!data.success) {
-          console.error('Synology API returned error:', data)
-          throw new Error(`Failed to fetch photos: ${JSON.stringify(data)}`)
-        }
-
-        // Process the photos to add thumbnail URLs
-        const processedPhotos = data.data.list.map(photo => {
-          const thumbnailUrl = photo.additional.thumbnail
-            ? this.getThumbnailUrl(
-                photo.id,
-                photo.additional.thumbnail.cache_key,
-                sid
-              )
-            : undefined
-          return {
-            ...photo,
-            thumbnailUrl
-          }
+        const response = await fetch(url, {
+          agent: this.ip.startsWith('https://') ? agent : undefined
         })
 
-        console.log(`Successfully fetched ${processedPhotos.length} photos`)
-        return processedPhotos
-      } catch (parseError) {
-        console.error('Error parsing photo response:', parseError)
-        console.error('Raw response:', rawResponse)
-        throw parseError
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const rawResponse = await response.text()
+
+        try {
+          const data = JSON.parse(rawResponse) as SynoResponse<{ list: Photo[] }>
+
+          if (!data.success) {
+            console.error('Synology API returned error:', data)
+            throw new Error(`Failed to fetch photos: ${JSON.stringify(data)}`)
+          }
+
+          // Process the photos to add thumbnail URLs
+          const processedPhotos = data.data.list.map(photo => {
+            const thumbnailUrl = photo.additional.thumbnail
+              ? this.getThumbnailUrl(
+                  photo.id,
+                  photo.additional.thumbnail.cache_key,
+                  sid
+                )
+              : undefined
+
+            return {
+              ...photo,
+              thumbnailUrl
+            }
+          })
+
+          allPhotos = allPhotos.concat(processedPhotos)
+          console.log(`Fetched ${processedPhotos.length} photos in this batch`)
+
+          // If we got fewer photos than the batch size, we've reached the end
+          hasMore = processedPhotos.length === batchSize
+          offset += batchSize
+
+        } catch (parseError) {
+          console.error('Failed to parse photo response:', parseError)
+          console.error('Raw response:', rawResponse)
+          throw parseError
+        }
       }
+
+      console.log(`Successfully fetched ${allPhotos.length} total photos`)
+      return allPhotos
+
     } catch (error) {
       console.error('Error fetching photos:', error)
       console.error('Full error details:', {
