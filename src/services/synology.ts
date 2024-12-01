@@ -89,7 +89,9 @@ export class SynologyService {
         const rawResponse = await response.text()
 
         try {
-          const data = JSON.parse(rawResponse) as SynoResponse<{ list: Photo[] }>
+          const data = JSON.parse(rawResponse) as SynoResponse<{
+            list: Photo[]
+          }>
 
           if (!data.success) {
             console.error('Synology API returned error:', data)
@@ -113,12 +115,10 @@ export class SynologyService {
           })
 
           allPhotos = allPhotos.concat(processedPhotos)
-          console.log(`Fetched ${processedPhotos.length} photos in this batch`)
 
           // If we got fewer photos than the batch size, we've reached the end
           hasMore = processedPhotos.length === batchSize
           offset += batchSize
-
         } catch (parseError) {
           console.error('Failed to parse photo response:', parseError)
           console.error('Raw response:', rawResponse)
@@ -128,7 +128,6 @@ export class SynologyService {
 
       console.log(`Successfully fetched ${allPhotos.length} total photos`)
       return allPhotos
-
     } catch (error) {
       console.error('Error fetching photos:', error)
       console.error('Full error details:', {

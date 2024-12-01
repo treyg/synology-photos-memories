@@ -20,7 +20,6 @@ function getWeekNumberInMonth(date: Date): number {
 function getMonthWeekRange(weekNum: number): { start: number; end: number } {
   const start = (weekNum - 1) * 7 + 1
   const end = weekNum * 7
-  console.log(`Week ${weekNum} range: ${start}-${end}`)
   return { start, end }
 }
 
@@ -39,10 +38,6 @@ export function filterPhotosByWeek(photos: Photo[], week: number): Photo[] {
     const matches =
       photoMonth === currentMonth && dayOfMonth >= start && dayOfMonth <= end
 
-    if (matches) {
-      console.log(`Matched photo from ${photoDate.toLocaleDateString()}`)
-    }
-
     return matches
   })
 
@@ -59,10 +54,6 @@ export function filterPhotosByMonth(photos: Photo[], month: number): Photo[] {
     const photoDate = new Date(photo.time * 1000)
     const photoMonth = photoDate.getMonth() + 1
     const matches = photoMonth === month
-
-    if (matches) {
-      console.log(`Matched photo from ${photoDate.toLocaleDateString()}`)
-    }
 
     return matches
   })
