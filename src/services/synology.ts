@@ -1,10 +1,20 @@
 import { Photo, SynoResponse } from '../types/index.js'
+import { Agent } from 'node:https'
 
+// Create a custom HTTPS agent that ignores SSL certificate validation
+const httpsAgent = new Agent({
+  rejectUnauthorized: false
+})
+
+// @ts-ignore
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
+// @ts-ignore
 const fetchOptions: RequestInit = {
-  // For handling self-signed certificates in development
   mode: 'cors',
-  credentials: 'include'
-}
+  credentials: 'include',
+  agent: httpsAgent
+} as any // Type assertion needed for node-fetch compatibility
 
 export class SynologyService {
   private ip: string
@@ -35,7 +45,7 @@ export class SynologyService {
     console.log('Authenticating with URL:', authUrl)
 
     try {
-      const response = await fetch(authUrl, fetchOptions)
+      const response = await globalThis.fetch(authUrl, fetchOptions)
 
       const rawAuthResponse = await response.text()
       console.log('Raw auth response:', rawAuthResponse)
@@ -61,7 +71,7 @@ export class SynologyService {
       const infoUrl = `${this.ip}/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all`
       console.log('Getting API info:', infoUrl)
 
-      const infoResponse = await fetch(infoUrl, fetchOptions)
+      const infoResponse = await globalThis.fetch(infoUrl, fetchOptions)
       const infoData = await infoResponse.json()
 
       const batchSize = 500
@@ -73,7 +83,7 @@ export class SynologyService {
         const url = `${this.ip}/webapi/entry.cgi?api=SYNO.${this.fotoSpace}.Browse.Item&version=1&method=list&additional=["thumbnail","resolution","orientation","video_convert","video_meta"]&type=photo&sort_by=takentime&sort_direction=desc&offset=${offset}&limit=${batchSize}&_sid=${sid}`
         console.log(`Fetching photos batch from offset ${offset}`)
 
-        const response = await fetch(url, fetchOptions)
+        const response = await globalThis.fetch(url, fetchOptions)
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
